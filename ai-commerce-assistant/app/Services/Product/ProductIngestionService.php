@@ -122,6 +122,14 @@ class ProductIngestionService
 
                 $listing->canonical_product_id = $canonical->id;
                 $listing->save();
+
+                if (! app()->runningUnitTests()) {
+                    try {
+                        app(\App\Services\Product\MultiMarketEnricherService::class)->enrich($canonical);
+                    } catch (\Throwable $e) {
+                        // Ignore enrichment error during ingestion
+                    }
+                }
             }
         }
 
