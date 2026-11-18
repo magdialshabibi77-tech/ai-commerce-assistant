@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import '../../../../core/widgets/smart_product_image.dart';
 import '../../../auth/presentation/providers/auth_notifier.dart';
 import '../../../market_research/presentation/screens/market_search_screen.dart';
 import '../../../products/data/models/canonical_product_model.dart';
@@ -499,6 +500,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  SmartProductImage(
+                    imageUrl: product.imageUrl,
+                    categoryName: product.categoryName,
+                    width: 70,
+                    height: 70,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

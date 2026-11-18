@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ai_commerce_mobile/core/constants/app_colors.dart';
 import 'package:ai_commerce_mobile/core/constants/app_strings.dart';
 import 'package:ai_commerce_mobile/core/utils/currency_formatter.dart';
+import 'package:ai_commerce_mobile/core/widgets/smart_product_image.dart';
 import 'package:ai_commerce_mobile/features/price_comparison/data/models/price_comparison_model.dart';
 import 'package:ai_commerce_mobile/features/price_comparison/presentation/providers/price_comparison_provider.dart';
 
@@ -445,17 +446,33 @@ class PriceComparisonScreen extends ConsumerWidget {
 
             const SizedBox(height: 12),
 
-            // Product Title Line (clean separation)
+            // Product Title and Thumbnail Line
             if (offer.title.isNotEmpty)
-              Text(
-                offer.title,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                  color: isDark ? Colors.grey.shade300 : AppColors.textPrimaryLight,
-                ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SmartProductImage(
+                    imageUrl: offer.imageUrl,
+                    categoryName: offer.source.name,
+                    width: 44,
+                    height: 44,
+                    borderRadius: BorderRadius.circular(8),
+                    iconSize: 22,
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      offer.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: isDark ? Colors.grey.shade300 : AppColors.textPrimaryLight,
+                      ),
+                    ),
+                  ),
+                ],
               ),
 
             const SizedBox(height: 8),

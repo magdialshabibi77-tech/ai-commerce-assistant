@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ai_commerce_mobile/core/constants/app_colors.dart';
 import 'package:ai_commerce_mobile/core/constants/app_strings.dart';
 import 'package:ai_commerce_mobile/core/utils/currency_formatter.dart';
+import 'package:ai_commerce_mobile/core/widgets/smart_product_image.dart';
 import 'package:ai_commerce_mobile/features/products/presentation/screens/product_details_screen.dart';
 import 'package:ai_commerce_mobile/features/market_research/data/models/market_item_model.dart';
 import 'package:ai_commerce_mobile/features/market_research/presentation/providers/market_search_notifier.dart';
@@ -253,11 +254,27 @@ class _MarketSearchScreenState extends ConsumerState<MarketSearchScreen> {
                     ],
                   ),
                   const SizedBox(height: 10),
-                  Text(
-                    item.title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SmartProductImage(
+                        imageUrl: item.imageUrl,
+                        categoryName: item.title,
+                        width: 60,
+                        height: 60,
+                        borderRadius: BorderRadius.circular(10),
+                        iconSize: 28,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          item.title,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 12),
                   Row(

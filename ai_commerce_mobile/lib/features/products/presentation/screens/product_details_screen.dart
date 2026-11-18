@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ai_commerce_mobile/core/constants/app_colors.dart';
 import 'package:ai_commerce_mobile/core/constants/app_strings.dart';
 import 'package:ai_commerce_mobile/core/utils/currency_formatter.dart';
+import 'package:ai_commerce_mobile/core/widgets/smart_product_image.dart';
 import 'package:ai_commerce_mobile/features/ai_analysis/presentation/screens/ai_analysis_screen.dart';
 import 'package:ai_commerce_mobile/features/price_comparison/presentation/screens/price_comparison_screen.dart';
 import 'package:ai_commerce_mobile/features/products/data/models/canonical_product_model.dart';
@@ -57,6 +58,27 @@ class ProductDetailsScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // Product Hero Showcase Image
+          Card(
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: BorderSide(color: Colors.grey.withAlpha(50)),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: SmartProductImage(
+                imageUrl: product.imageUrl,
+                categoryName: product.categoryName,
+                height: 190,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                iconSize: 48,
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+
           // Product Header Card
           Card(
             child: Padding(

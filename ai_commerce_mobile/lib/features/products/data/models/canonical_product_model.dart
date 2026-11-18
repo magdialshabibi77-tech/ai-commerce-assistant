@@ -74,6 +74,7 @@ class CanonicalProductModel {
   final double? rating;
   final int reviewsCount;
   final double? latestOpportunityScore;
+  final String? imageUrl;
   final List<ProductListingModel> listings;
   final String? createdAt;
   final String? updatedAt;
@@ -93,6 +94,7 @@ class CanonicalProductModel {
     this.rating,
     this.reviewsCount = 0,
     this.latestOpportunityScore,
+    this.imageUrl,
     this.listings = const [],
     this.createdAt,
     this.updatedAt,
@@ -141,6 +143,7 @@ class CanonicalProductModel {
       rating: _parseNullableDouble(json['rating']),
       reviewsCount: _parseInt(json['reviews_count']),
       latestOpportunityScore: _parseNullableDouble(json['latest_opportunity_score']),
+      imageUrl: _parseNullableString(json['image_url']) ?? (parsedListings.isNotEmpty ? parsedListings.first.imageUrl : null),
       listings: parsedListings,
       createdAt: _parseNullableString(json['created_at']),
       updatedAt: _parseNullableString(json['updated_at']),

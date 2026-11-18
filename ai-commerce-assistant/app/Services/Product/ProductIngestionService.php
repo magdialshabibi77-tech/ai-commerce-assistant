@@ -83,7 +83,7 @@ class ProductIngestionService
                 'description' => $dto->description,
                 'brand' => $dto->brand,
                 'url' => $dto->url,
-                'image_url' => $dto->imageUrl,
+                'image_url' => app(\App\Services\Product\ProductImageService::class)->downloadAndStore($dto->imageUrl) ?? $dto->imageUrl,
                 'currency' => strtoupper($dto->currency ?: 'USD'),
                 'price' => $dto->price,
                 'original_price' => $dto->originalPrice,

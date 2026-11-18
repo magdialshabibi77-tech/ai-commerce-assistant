@@ -9,6 +9,7 @@ class MarketItemModel {
   final int reviewsCount;
   final bool? isAvailable;
   final String? url;
+  final String? imageUrl;
   final String sourceCode;
   final String sourceName;
 
@@ -23,6 +24,7 @@ class MarketItemModel {
     required this.reviewsCount,
     this.isAvailable,
     this.url,
+    this.imageUrl,
     required this.sourceCode,
     required this.sourceName,
   });
@@ -39,6 +41,7 @@ class MarketItemModel {
       reviewsCount: json['reviews_count'] as int? ?? 0,
       isAvailable: json['is_available'] is bool ? json['is_available'] as bool : null,
       url: json['url']?.toString(),
+      imageUrl: json['image_url']?.toString(),
       sourceCode: json['source']?['code']?.toString() ?? 'ebay',
       sourceName: json['source']?['name']?.toString() ?? 'eBay Marketplace',
     );

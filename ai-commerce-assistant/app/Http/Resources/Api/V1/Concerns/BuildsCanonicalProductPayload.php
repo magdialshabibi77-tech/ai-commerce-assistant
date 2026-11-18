@@ -25,6 +25,10 @@ trait BuildsCanonicalProductPayload
         $listings = $this->relationLoaded('listings') ? $this->listings : collect();
         $activeListings = $listings->where('is_available', true)->values();
         $firstListing = $listings->first();
+        $imageUrl = $firstListing?->image_url;
+        if (! $imageUrl && $this->relationLoaded('category') && $this->category) {
+            $imageUrl = app(\App\Services\Product\ProductImageService::class)->getCategoryFallbackImage($this->category->name ?? $this->category->slug);
+        }
 
         $baseCurrency = strtoupper(trim((string) ($this->base_currency ?: 'USD')));
         $priceSummary = $this->computeNormalizedPriceSummary($activeListings, $baseCurrency);
@@ -52,6 +56,7 @@ trait BuildsCanonicalProductPayload
             'brand' => $this->brand,
             'model_number' => $this->model_number,
             'description' => $this->description,
+            'image_url' => $imageUrl,
             'base_currency' => $baseCurrency,
             'category' => $this->relationLoaded('category')
                 ? ($this->category ? new CategoryResource($this->category) : null)
