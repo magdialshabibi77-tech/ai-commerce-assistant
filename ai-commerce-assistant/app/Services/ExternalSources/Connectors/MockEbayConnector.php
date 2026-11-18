@@ -98,11 +98,38 @@ class MockEbayConnector implements MarketConnectorInterface
 
                 if (! empty($products)) {
                     $items = [];
-                    foreach ($products as $p) {
+                    $storePresets = [
+                        [
+                            'seller' => 'مكتبة جرير - Jarir Bookstore Official',
+                            'url_prefix' => 'https://www.jarir.com/sa-ar/search?q=',
+                        ],
+                        [
+                            'seller' => 'متجر نون - Noon Express Verified',
+                            'url_prefix' => 'https://www.noon.com/saudi-ar/search?q=',
+                        ],
+                        [
+                            'seller' => 'إكسترا السعودية - eXtra Stores Authorized',
+                            'url_prefix' => 'https://www.extra.com/ar-sa/search?q=',
+                        ],
+                        [
+                            'seller' => 'Amazon Prime Official Store',
+                            'url_prefix' => 'https://www.amazon.com/s?k=',
+                        ],
+                        [
+                            'seller' => 'eBay Top-Rated Merchant Hub',
+                            'url_prefix' => 'https://www.ebay.com/sch/i.html?_nkw=',
+                        ],
+                        [
+                            'seller' => 'AliExpress Direct Global Store',
+                            'url_prefix' => 'https://www.aliexpress.com/wholesale?SearchText=',
+                        ],
+                    ];
+
+                    foreach ($products as $idx => $p) {
+                        $store = $storePresets[$idx % count($storePresets)];
                         $sellerScore = rand(2500, 35000);
                         $sellerFeedback = '99.' . rand(2, 9);
-                        $brandClean = preg_replace('/[^a-zA-Z0-9]/', '', (string) ($p['brand'] ?? 'verified'));
-                        $sellerName = strtolower($brandClean ?: 'market') . '_official_hub';
+                        $sellerName = $store['seller'];
 
                         $items[] = [
                             'itemId' => 'v1|EBAY-LIVE-' . $p['id'] . '|0',
@@ -112,7 +139,7 @@ class MockEbayConnector implements MarketConnectorInterface
                                 'currency' => 'USD',
                             ],
                             'condition' => 'New',
-                            'itemWebUrl' => 'https://www.ebay.com/itm/EBAY-LIVE-' . $p['id'],
+                            'itemWebUrl' => $store['url_prefix'] . urlencode((string) $p['title']),
                             'image' => [
                                 'imageUrl' => (string) ($p['thumbnail'] ?? ($p['images'][0] ?? '')),
                             ],

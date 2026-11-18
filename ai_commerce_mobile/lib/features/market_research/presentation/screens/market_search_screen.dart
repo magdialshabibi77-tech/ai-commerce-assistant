@@ -106,7 +106,7 @@ class _MarketSearchScreenState extends ConsumerState<MarketSearchScreen> {
                       CircularProgressIndicator(),
                       SizedBox(height: 16),
                       Text(
-                        'جاري فحص عروض سوق eBay وتوحيد البيانات...',
+                        'جاري فحص وتوحيد عروض الأسعار من كبرى المتاجر (جرير، نون، إكسترا، أمازون)...',
                         style: TextStyle(color: AppColors.textSecondaryLight),
                       ),
                     ],
@@ -156,13 +156,13 @@ class _MarketSearchScreenState extends ConsumerState<MarketSearchScreen> {
             ),
             const SizedBox(height: 16),
             const Text(
-              'أدخل اسم المنتج للبحث في الأسواق الخارجية',
+              'أدخل اسم المنتج للبحث في الأسواق والمتاجر',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             const Text(
-              'يقوم النظام باسترجاع عروض الأسعار الحية من eBay وتوحيدها ومطابقتها هندسياً بدون تكرار.',
+              'يقوم النظام باسترجاع عروض الأسعار الحية من كبرى المتاجر المحلية والعالمية (جرير، نون، إكسترا، أمازون، إيباي) وتوحيدها ومطابقتها هندسياً بدون تكرار.',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 13, color: AppColors.textSecondaryLight),
             ),
@@ -225,13 +225,13 @@ class _MarketSearchScreenState extends ConsumerState<MarketSearchScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
-                          color: Colors.blue.withValues(alpha: 0.1),
+                          color: _getStoreBadgeColor(item.sourceName).withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
                           item.sourceName,
-                          style: const TextStyle(
-                            color: Colors.blue,
+                          style: TextStyle(
+                            color: _getStoreBadgeColor(item.sourceName),
                             fontSize: 11,
                             fontWeight: FontWeight.bold,
                           ),
@@ -300,5 +300,25 @@ class _MarketSearchScreenState extends ConsumerState<MarketSearchScreen> {
         );
       },
     );
+  }
+
+  Color _getStoreBadgeColor(String sourceName) {
+    final lower = sourceName.toLowerCase();
+    if (lower.contains('جرير') || lower.contains('jarir')) {
+      return const Color(0xFF00838F); // Jarir Cyan/Teal
+    }
+    if (lower.contains('نون') || lower.contains('noon')) {
+      return const Color(0xFFD97706); // Noon Gold/Amber
+    }
+    if (lower.contains('إكسترا') || lower.contains('اكسترا') || lower.contains('extra')) {
+      return const Color(0xFF1E40AF); // eXtra Navy
+    }
+    if (lower.contains('أمازون') || lower.contains('امازون') || lower.contains('amazon')) {
+      return const Color(0xFFEA580C); // Amazon Orange
+    }
+    if (lower.contains('aliexpress') || lower.contains('alibaba') || lower.contains('علي')) {
+      return const Color(0xFFDC2626); // Red
+    }
+    return const Color(0xFF2563EB); // eBay / default Blue
   }
 }

@@ -14,6 +14,24 @@ class ProductSourceSeeder extends Seeder
     {
         $sources = [
             [
+                'code' => 'jarir',
+                'name' => 'مكتبة جرير | Jarir Bookstore',
+                'base_url' => 'https://www.jarir.com',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'noon',
+                'name' => 'متجر نون | Noon Marketplace',
+                'base_url' => 'https://www.noon.com',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'extra',
+                'name' => 'إكسترا للإلكترونيات | eXtra Stores',
+                'base_url' => 'https://www.extra.com',
+                'is_active' => true,
+            ],
+            [
                 'code' => 'amazon',
                 'name' => 'Amazon Marketplace',
                 'base_url' => 'https://www.amazon.com',
@@ -33,7 +51,7 @@ class ProductSourceSeeder extends Seeder
             ],
             [
                 'code' => 'ebay',
-                'name' => 'eBay Global Marketplace',
+                'name' => 'eBay Marketplace',
                 'base_url' => 'https://www.ebay.com',
                 'is_active' => true,
             ],
@@ -47,4 +65,3 @@ class ProductSourceSeeder extends Seeder
         }
     }
 }
-
