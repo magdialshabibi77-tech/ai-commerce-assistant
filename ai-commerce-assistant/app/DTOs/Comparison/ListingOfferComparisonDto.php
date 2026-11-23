@@ -25,7 +25,11 @@ class ListingOfferComparisonDto
         public readonly int $reviewsCount,
         public readonly bool $isAvailable,
         public readonly ?string $observedAt,
-        public readonly ?array $seller = null
+        public readonly ?array $seller = null,
+        public readonly string $condition = 'new',
+        public readonly bool $authenticityGuaranteed = false,
+        public readonly ?float $sellerRating = null,
+        public readonly ?string $affiliateUrl = null
     ) {}
 
     public function toArray(): array
@@ -50,6 +54,10 @@ class ListingOfferComparisonDto
             'rating' => $this->rating,
             'reviews_count' => $this->reviewsCount,
             'is_available' => $this->isAvailable,
+            'condition' => $this->condition,
+            'authenticity_guaranteed' => $this->authenticityGuaranteed,
+            'seller_rating' => $this->sellerRating,
+            'affiliate_url' => $this->affiliateUrl ?: $this->url,
             'observed_at' => $this->observedAt,
         ];
     }

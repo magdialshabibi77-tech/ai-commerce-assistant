@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:ai_commerce_mobile/core/constants/app_colors.dart';
 import 'package:ai_commerce_mobile/core/constants/app_strings.dart';
 import 'package:ai_commerce_mobile/core/utils/currency_formatter.dart';
@@ -349,13 +350,39 @@ class PriceComparisonScreen extends ConsumerWidget {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            arabicStoreName,
-                            style: TextStyle(
-                              color: storeColors,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
-                            ),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                arabicStoreName,
+                                style: TextStyle(
+                                  color: storeColors,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
+                              ),
+                              if (offer.sellerRating != null) ...[
+                                const SizedBox(width: 6),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                  decoration: BoxDecoration(
+                                    color: Colors.amber.withValues(alpha: 0.18),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(Icons.star_rounded, size: 12, color: Colors.amber),
+                                      const SizedBox(width: 2),
+                                      Text(
+                                        '${offer.sellerRating!.toStringAsFixed(1)}%',
+                                        style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.amber),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
                           if (englishStoreSubtitle.isNotEmpty && englishStoreSubtitle != arabicStoreName)
                             Text(
@@ -369,6 +396,48 @@ class PriceComparisonScreen extends ConsumerWidget {
                         ],
                       ),
                     ],
+                  ),
+                ),
+                const SizedBox(width: 6),
+
+                // Authenticity & Condition Badges
+                if (offer.authenticityGuaranteed)
+                  Container(
+                    margin: const EdgeInsets.only(left: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1E88E5).withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(4),
+                      border: Border.all(color: const Color(0xFF1E88E5).withValues(alpha: 0.4)),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.verified_user, size: 11, color: Color(0xFF1E88E5)),
+                        SizedBox(width: 3),
+                        Text(
+                          'مفحوص الأصالة',
+                          style: TextStyle(color: Color(0xFF1E88E5), fontSize: 10, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                // Condition Badge
+                Container(
+                  margin: const EdgeInsets.only(left: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: (offer.condition == 'new' ? AppColors.buy : (offer.condition == 'refurbished' ? Colors.deepPurple : Colors.blueGrey)).withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    offer.condition == 'new' ? 'جديد' : (offer.condition == 'refurbished' ? 'مجدد' : 'مستعمل'),
+                    style: TextStyle(
+                      color: offer.condition == 'new' ? AppColors.buy : (offer.condition == 'refurbished' ? Colors.deepPurple : Colors.blueGrey),
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -508,6 +577,34 @@ class PriceComparisonScreen extends ConsumerWidget {
                 ],
               ],
             ),
+
+            // Buy Now / Affiliate Call To Action Button
+            if (offer.affiliateUrl != null || offer.url != null) ...[
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () async {
+                    final targetUrl = offer.affiliateUrl ?? offer.url;
+                    if (targetUrl != null && targetUrl.isNotEmpty) {
+                      final uri = Uri.parse(targetUrl);
+                      if (await canLaunchUrl(uri)) {
+                        await launchUrl(uri, mode: LaunchMode.externalApplication);
+                      }
+                    }
+                  },
+                  icon: const Icon(Icons.shopping_cart_checkout_rounded, size: 16),
+                  label: const Text('شراء الآن من المتجر (Buy Now)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: storeColors,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    elevation: 0,
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       ),

@@ -90,6 +90,10 @@ class ProductIngestionService
                 'rating' => $dto->rating,
                 'reviews_count' => $dto->reviewsCount ?? 0,
                 'is_available' => $dto->isAvailable,
+                'condition' => $dto->condition ?? 'new',
+                'authenticity_guaranteed' => $dto->authenticityGuaranteed ?? false,
+                'seller_rating' => $dto->sellerRating,
+                'affiliate_url' => $dto->affiliateUrl ?: $dto->url,
                 'raw_payload' => $dto->rawPayload,
                 'observed_at' => now(),
             ]

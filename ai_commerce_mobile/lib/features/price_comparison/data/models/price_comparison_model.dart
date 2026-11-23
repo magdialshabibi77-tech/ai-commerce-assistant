@@ -60,6 +60,10 @@ class ComparisonOfferModel {
   final int reviewsCount;
   final bool? isAvailable;
   final String? observedAt;
+  final String condition;
+  final bool authenticityGuaranteed;
+  final double? sellerRating;
+  final String? affiliateUrl;
 
   const ComparisonOfferModel({
     required this.listingId,
@@ -78,6 +82,10 @@ class ComparisonOfferModel {
     required this.reviewsCount,
     this.isAvailable,
     this.observedAt,
+    this.condition = 'new',
+    this.authenticityGuaranteed = false,
+    this.sellerRating,
+    this.affiliateUrl,
   });
 
   factory ComparisonOfferModel.fromJson(Map<String, dynamic> json) {
@@ -108,6 +116,10 @@ class ComparisonOfferModel {
       reviewsCount: _parseInt(json['reviews_count']),
       isAvailable: json['is_available'] is bool ? json['is_available'] as bool : null,
       observedAt: _parseNullableString(json['observed_at']),
+      condition: json['condition']?.toString() ?? 'new',
+      authenticityGuaranteed: json['authenticity_guaranteed'] is bool ? json['authenticity_guaranteed'] as bool : false,
+      sellerRating: _parseNullableDouble(json['seller_rating']),
+      affiliateUrl: _parseNullableString(json['affiliate_url'] ?? json['url']),
     );
   }
 }

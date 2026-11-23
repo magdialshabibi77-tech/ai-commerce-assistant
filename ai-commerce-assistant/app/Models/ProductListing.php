@@ -31,6 +31,10 @@ class ProductListing extends Model
         'rating',
         'reviews_count',
         'is_available',
+        'condition',
+        'authenticity_guaranteed',
+        'seller_rating',
+        'affiliate_url',
         'raw_payload',
         'observed_at',
     ];
@@ -43,6 +47,8 @@ class ProductListing extends Model
             'rating' => 'decimal:2',
             'reviews_count' => 'integer',
             'is_available' => 'boolean',
+            'authenticity_guaranteed' => 'boolean',
+            'seller_rating' => 'decimal:2',
             'raw_payload' => 'array',
             'observed_at' => 'datetime',
         ];

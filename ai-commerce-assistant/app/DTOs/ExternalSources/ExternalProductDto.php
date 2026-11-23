@@ -25,6 +25,10 @@ class ExternalProductDto
         public readonly ?string $imageUrl = null,
         public readonly bool $isAvailable = true,
         public readonly ?string $categorySlug = null,
+        public readonly ?string $condition = 'new',
+        public readonly bool $authenticityGuaranteed = false,
+        public readonly ?float $sellerRating = null,
+        public readonly ?string $affiliateUrl = null,
         public readonly array $rawPayload = []
     ) {}
 
@@ -52,6 +56,10 @@ class ExternalProductDto
             'image_url' => $this->imageUrl,
             'is_available' => $this->isAvailable,
             'category_slug' => $this->categorySlug,
+            'condition' => $this->condition,
+            'authenticity_guaranteed' => $this->authenticityGuaranteed,
+            'seller_rating' => $this->sellerRating,
+            'affiliate_url' => $this->affiliateUrl,
             'raw_payload' => $this->rawPayload,
         ];
     }
@@ -81,6 +89,10 @@ class ExternalProductDto
             imageUrl: $data['image_url'] ?? null,
             isAvailable: (bool) ($data['is_available'] ?? true),
             categorySlug: $data['category_slug'] ?? null,
+            condition: (string) ($data['condition'] ?? 'new'),
+            authenticityGuaranteed: (bool) ($data['authenticity_guaranteed'] ?? false),
+            sellerRating: isset($data['seller_rating']) ? (float) $data['seller_rating'] : null,
+            affiliateUrl: $data['affiliate_url'] ?? null,
             rawPayload: (array) ($data['raw_payload'] ?? [])
         );
     }

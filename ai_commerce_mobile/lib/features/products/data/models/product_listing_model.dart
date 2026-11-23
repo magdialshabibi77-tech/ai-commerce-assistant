@@ -41,6 +41,10 @@ class ProductListingModel {
   final String? url;
   final String? imageUrl;
   final String? observedAt;
+  final String condition; // new, used, refurbished
+  final bool authenticityGuaranteed;
+  final double? sellerRating;
+  final String? affiliateUrl;
   final ListingSellerModel? seller;
 
   const ProductListingModel({
@@ -61,6 +65,10 @@ class ProductListingModel {
     this.url,
     this.imageUrl,
     this.observedAt,
+    this.condition = 'new',
+    this.authenticityGuaranteed = false,
+    this.sellerRating,
+    this.affiliateUrl,
     this.seller,
   });
 
@@ -92,6 +100,10 @@ class ProductListingModel {
       url: _parseNullableString(json['url']),
       imageUrl: _parseNullableString(json['image_url']),
       observedAt: _parseNullableString(json['observed_at']),
+      condition: json['condition']?.toString() ?? 'new',
+      authenticityGuaranteed: json['authenticity_guaranteed'] is bool ? json['authenticity_guaranteed'] as bool : false,
+      sellerRating: _parseNullableDouble(json['seller_rating']),
+      affiliateUrl: _parseNullableString(json['affiliate_url'] ?? json['url']),
       seller: seller,
     );
   }

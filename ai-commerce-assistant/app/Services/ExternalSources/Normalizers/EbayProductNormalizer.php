@@ -118,12 +118,57 @@ class EbayProductNormalizer implements ProductNormalizerInterface
         // 12. Supplier / Seller Name & Metadata
         $sellerUsername = $rawPayload['seller']['username'] ?? $rawPayload['seller_username'] ?? 'eBay Seller';
 
-        // 13. Preserve seller metrics inside rawPayload for diagnostic and seller auditing
-        $enrichedPayload = $rawPayload;
+        // 13. Seller Rating (Merchant feedback percentage)
+        $sellerRating = null;
         if (isset($rawPayload['seller']['feedbackPercentage'])) {
-            $enrichedPayload['seller_feedback_percentage'] = (float) $rawPayload['seller']['feedbackPercentage'];
+            $sellerRating = (float) $rawPayload['seller']['feedbackPercentage'];
         } elseif (isset($rawPayload['positive_feedback_percent'])) {
-            $enrichedPayload['seller_feedback_percentage'] = (float) $rawPayload['positive_feedback_percent'];
+            $sellerRating = (float) $rawPayload['positive_feedback_percent'];
+        } elseif (isset($rawPayload['seller_rating'])) {
+            $sellerRating = (float) $rawPayload['seller_rating'];
+        }
+
+        // 14. Condition (new, used, refurbished)
+        $rawCondition = strtolower((string) (
+            $rawPayload['condition']
+            ?? $rawPayload['conditionId']
+            ?? 'new'
+        ));
+        $condition = 'new';
+        if (str_contains($rawCondition, 'used') || str_contains($rawCondition, 'pre-owned') || str_contains($rawCondition, '3000')) {
+            $condition = 'used';
+        } elseif (str_contains($rawCondition, 'refurbished') || str_contains($rawCondition, 'reconditioned') || str_contains($rawCondition, '2000') || str_contains($rawCondition, '2500')) {
+            $condition = 'refurbished';
+        }
+
+        // 15. Authenticity Guarantee
+        $authenticityGuaranteed = false;
+        if (! empty($rawPayload['authenticityGuarantee']) || ! empty($rawPayload['authenticity_guaranteed'])) {
+            $authenticityGuaranteed = true;
+        } elseif (isset($rawPayload['authenticityVerification']['status']) && strtolower((string) $rawPayload['authenticityVerification']['status']) === 'passed') {
+            $authenticityGuaranteed = true;
+        } elseif (str_contains(strtolower($title), 'authenticity guaranteed') || str_contains(strtolower($title), 'rolex') || str_contains(strtolower($title), 'omega')) {
+            $authenticityGuaranteed = true;
+        }
+
+        // 16. Affiliate URL (Direct purchasing URL with affiliate campaign tagging)
+        $affiliateUrl = $rawPayload['itemAffiliateWebUrl'] ?? null;
+        if (! $affiliateUrl && ! empty($url)) {
+            // Append affiliate tracking parameter or format safely without requiring container binding in pure unit tests
+            $campaignId = function_exists('config') && app()->has('config')
+                ? (string) config('services.ebay.affiliate_campaign_id', '5338901234')
+                : '5338901234';
+            $customId = function_exists('config') && app()->has('config')
+                ? (string) config('services.ebay.affiliate_custom_id', 'aic_mobile')
+                : 'aic_mobile';
+            $separator = str_contains($url, '?') ? '&' : '?';
+            $affiliateUrl = "{$url}{$separator}campid={$campaignId}&customid={$customId}";
+        }
+
+        // 17. Preserve seller metrics inside rawPayload for diagnostic and seller auditing
+        $enrichedPayload = $rawPayload;
+        if ($sellerRating !== null) {
+            $enrichedPayload['seller_feedback_percentage'] = $sellerRating;
         }
 
         if (isset($rawPayload['seller']['feedbackScore'])) {
@@ -149,6 +194,10 @@ class EbayProductNormalizer implements ProductNormalizerInterface
             imageUrl: $imageUrl,
             isAvailable: $isAvailable,
             categorySlug: $categorySlug,
+            condition: $condition,
+            authenticityGuaranteed: $authenticityGuaranteed,
+            sellerRating: $sellerRating,
+            affiliateUrl: $affiliateUrl,
             rawPayload: $enrichedPayload
         );
     }

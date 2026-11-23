@@ -90,7 +90,11 @@ class PriceComparisonService implements PriceComparisonServiceInterface
                 reviewsCount: (int) $listing->reviews_count,
                 isAvailable: (bool) $listing->is_available,
                 observedAt: $listing->observed_at?->toISOString(),
-                seller: $listing->extractSellerSummary()
+                seller: $listing->extractSellerSummary(),
+                condition: $listing->condition ?? 'new',
+                authenticityGuaranteed: (bool) ($listing->authenticity_guaranteed ?? false),
+                sellerRating: $listing->seller_rating !== null ? (float) $listing->seller_rating : null,
+                affiliateUrl: $listing->affiliate_url ?: $listing->url
             );
 
             $offers[] = $dto;
