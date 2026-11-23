@@ -94,7 +94,13 @@ class PriceComparisonService implements PriceComparisonServiceInterface
                 condition: $listing->condition ?? 'new',
                 authenticityGuaranteed: (bool) ($listing->authenticity_guaranteed ?? false),
                 sellerRating: $listing->seller_rating !== null ? (float) $listing->seller_rating : null,
-                affiliateUrl: $listing->affiliate_url ?: $listing->url
+                affiliateUrl: $listing->affiliate_url ?: $listing->url,
+                buyUrl: app(\App\Services\Product\ProductUrlResolverService::class)->resolveBuyUrl(
+                    $listing->affiliate_url,
+                    $listing->url,
+                    $listing->source->code ?? 'store',
+                    $listing->title
+                )
             );
 
             $offers[] = $dto;

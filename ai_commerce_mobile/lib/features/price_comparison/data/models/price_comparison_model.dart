@@ -64,6 +64,7 @@ class ComparisonOfferModel {
   final bool authenticityGuaranteed;
   final double? sellerRating;
   final String? affiliateUrl;
+  final String? buyUrl;
 
   const ComparisonOfferModel({
     required this.listingId,
@@ -86,6 +87,7 @@ class ComparisonOfferModel {
     this.authenticityGuaranteed = false,
     this.sellerRating,
     this.affiliateUrl,
+    this.buyUrl,
   });
 
   factory ComparisonOfferModel.fromJson(Map<String, dynamic> json) {
@@ -120,6 +122,7 @@ class ComparisonOfferModel {
       authenticityGuaranteed: json['authenticity_guaranteed'] is bool ? json['authenticity_guaranteed'] as bool : false,
       sellerRating: _parseNullableDouble(json['seller_rating']),
       affiliateUrl: _parseNullableString(json['affiliate_url'] ?? json['url']),
+      buyUrl: _parseNullableString(json['buy_url'] ?? json['affiliate_url'] ?? json['url']),
     );
   }
 }

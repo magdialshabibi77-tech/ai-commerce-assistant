@@ -308,13 +308,13 @@ class ProductDetailsScreen extends ConsumerWidget {
               ),
             )
           else
-            ...product.listings.map((offer) => _buildOfferCard(offer)),
+            ...product.listings.map((offer) => _buildOfferCard(context, offer)),
         ],
       ),
     );
   }
 
-  Widget _buildOfferCard(ProductListingModel offer) {
+  Widget _buildOfferCard(BuildContext context, ProductListingModel offer) {
     final sourceLabel = offer.sourceName.isNotEmpty
         ? offer.sourceName
         : (offer.sourceCode.isNotEmpty ? offer.sourceCode.toUpperCase() : AppStrings.dataUnavailable);
@@ -450,32 +450,40 @@ class ProductDetailsScreen extends ConsumerWidget {
             ),
 
             // Buy Now / Affiliate Button
-            if (offer.affiliateUrl != null || offer.url != null) ...[
-              const SizedBox(height: 10),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: () async {
-                    final targetUrl = offer.affiliateUrl ?? offer.url;
-                    if (targetUrl != null && targetUrl.isNotEmpty) {
-                      final uri = Uri.parse(targetUrl);
-                      if (await canLaunchUrl(uri)) {
-                        await launchUrl(uri, mode: LaunchMode.externalApplication);
-                      }
+            const SizedBox(height: 10),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () async {
+                  final targetUrl = offer.buyUrl ?? offer.affiliateUrl ?? offer.url;
+                  if (targetUrl != null && targetUrl.isNotEmpty) {
+                    final uri = Uri.parse(targetUrl);
+                    if (await canLaunchUrl(uri)) {
+                      await launchUrl(uri, mode: LaunchMode.externalApplication);
+                      return;
                     }
-                  },
-                  icon: const Icon(Icons.shopping_cart_checkout_rounded, size: 15),
-                  label: const Text('شراء الآن من المتجر (Buy Now)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    elevation: 0,
-                  ),
+                  }
+
+                  // Null / Invalid Fallback SnackBar
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('عذراً، هذا العرض غير متاح للشراء المباشر حالياً، يمكنك البحث عنه في المتجر'),
+                      backgroundColor: Colors.blueGrey,
+                      duration: Duration(seconds: 3),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.shopping_cart_checkout_rounded, size: 15),
+                label: const Text('شراء الآن من المتجر (Buy Now)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  elevation: 0,
                 ),
               ),
-            ],
+            ),
           ],
         ),
       ),

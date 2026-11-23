@@ -34,6 +34,12 @@ class ProductListingResource extends JsonResource
             'authenticity_guaranteed' => (bool) ($this->authenticity_guaranteed ?? false),
             'seller_rating' => $this->seller_rating,
             'affiliate_url' => $this->affiliate_url ?: $this->url,
+            'buy_url' => app(\App\Services\Product\ProductUrlResolverService::class)->resolveBuyUrl(
+                $this->affiliate_url,
+                $this->url,
+                $this->source?->code ?? ($this->relationLoaded('source') ? $this->source?->code : '') ?? 'store',
+                $this->title
+            ),
             'url' => $this->url,
             'image_url' => $this->image_url,
             'observed_at' => $this->observed_at?->toISOString(),

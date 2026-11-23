@@ -29,7 +29,8 @@ class ListingOfferComparisonDto
         public readonly string $condition = 'new',
         public readonly bool $authenticityGuaranteed = false,
         public readonly ?float $sellerRating = null,
-        public readonly ?string $affiliateUrl = null
+        public readonly ?string $affiliateUrl = null,
+        public readonly ?string $buyUrl = null
     ) {}
 
     public function toArray(): array
@@ -58,6 +59,7 @@ class ListingOfferComparisonDto
             'authenticity_guaranteed' => $this->authenticityGuaranteed,
             'seller_rating' => $this->sellerRating,
             'affiliate_url' => $this->affiliateUrl ?: $this->url,
+            'buy_url' => $this->buyUrl ?: ($this->affiliateUrl ?: $this->url),
             'observed_at' => $this->observedAt,
         ];
     }

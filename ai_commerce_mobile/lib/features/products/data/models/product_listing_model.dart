@@ -45,6 +45,7 @@ class ProductListingModel {
   final bool authenticityGuaranteed;
   final double? sellerRating;
   final String? affiliateUrl;
+  final String? buyUrl;
   final ListingSellerModel? seller;
 
   const ProductListingModel({
@@ -69,6 +70,7 @@ class ProductListingModel {
     this.authenticityGuaranteed = false,
     this.sellerRating,
     this.affiliateUrl,
+    this.buyUrl,
     this.seller,
   });
 
@@ -104,6 +106,7 @@ class ProductListingModel {
       authenticityGuaranteed: json['authenticity_guaranteed'] is bool ? json['authenticity_guaranteed'] as bool : false,
       sellerRating: _parseNullableDouble(json['seller_rating']),
       affiliateUrl: _parseNullableString(json['affiliate_url'] ?? json['url']),
+      buyUrl: _parseNullableString(json['buy_url'] ?? json['affiliate_url'] ?? json['url']),
       seller: seller,
     );
   }
