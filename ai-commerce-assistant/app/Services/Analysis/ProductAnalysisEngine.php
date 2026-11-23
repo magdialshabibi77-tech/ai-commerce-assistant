@@ -13,10 +13,12 @@ class ProductAnalysisEngine
 {
     public function __construct(
         protected ?CurrencyConverterInterface $currencyConverter = null,
-        protected ?OpportunityScoreEngine $opportunityScoreEngine = null
+        protected ?OpportunityScoreEngine $opportunityScoreEngine = null,
+        protected ?LandedCostService $landedCostService = null
     ) {
         $this->currencyConverter = $currencyConverter ?? new StaticCurrencyConverter();
         $this->opportunityScoreEngine = $opportunityScoreEngine ?? new OpportunityScoreEngine();
+        $this->landedCostService = $landedCostService ?? new LandedCostService();
     }
 
     /**
@@ -66,14 +68,43 @@ class ProductAnalysisEngine
         $estimatedFees = $this->formatAmount($rawEstimatedFees);
         $otherCosts = $this->formatAmount($rawOtherCosts);
 
+        $hasExplicitCustomsRate = isset($params['customs_rate']) && $params['customs_rate'] !== null && $params['customs_rate'] !== '';
+        $customsRate = $hasExplicitCustomsRate ? (float) $params['customs_rate'] : null;
+
+        $hasExplicitVatRate = isset($params['vat_rate']) && $params['vat_rate'] !== null && $params['vat_rate'] !== '';
+        $vatRate = $hasExplicitVatRate ? (float) $params['vat_rate'] : null;
+
+        $hasSellingPrice = $this->hasExplicitNumericParam($params, 'selling_price');
+        $landedBreakdown = $this->landedCostService->compute(
+            buyPrice: $purchasePrice,
+            shippingCost: $shippingCost,
+            sellingPrice: $hasSellingPrice ? $sellingPrice : null,
+            customsRate: $customsRate,
+            vatRate: $vatRate,
+            platformFee: $estimatedFees,
+            otherCosts: $otherCosts
+        );
+
+        $customsFee = $landedBreakdown['customs_fee'];
+        $vatAmount = $landedBreakdown['vat_amount'];
+        $landedCost = $landedBreakdown['landed_cost'];
+        $customsRateStr = $landedBreakdown['customs_rate'];
+        $vatRateStr = $landedBreakdown['vat_rate'];
+
         $rating = isset($params['rating']) ? (float) $params['rating'] : null;
         $reviewsCount = (int) ($params['reviews_count'] ?? 0);
 
         // 3. Deterministic Financial Math via BCMath
-        // Total Cost = purchase + shipping + fees + other
-        $totalCost = bcadd($purchasePrice, $shippingCost, 4);
-        $totalCost = bcadd($totalCost, $estimatedFees, 4);
-        $totalCost = bcadd($totalCost, $otherCosts, 4);
+        // If explicit customs or vat rates are passed, totalCost is based on LandedCostService breakdown;
+        // otherwise, for standard backward compatibility with legacy baseline tests:
+        if ($hasExplicitCustomsRate || $hasExplicitVatRate) {
+            $totalCost = $landedBreakdown['total_cost'];
+        } else {
+            // Baseline calculation without customs/VAT unless requested: totalCost = purchase + shipping + fees + other
+            $totalCost = bcadd($purchasePrice, $shippingCost, 4);
+            $totalCost = bcadd($totalCost, $estimatedFees, 4);
+            $totalCost = bcadd($totalCost, $otherCosts, 4);
+        }
 
         // Estimated Net Profit = selling_price - total_cost
         $estimatedProfit = bcsub($sellingPrice, $totalCost, 4);
@@ -121,10 +152,17 @@ class ProductAnalysisEngine
             'original_selling_price' => $this->formatAmount($rawSellingPrice),
             'original_selling_currency' => $sellingCurrency,
             'shipping_cost' => $shippingCost,
+            'customs_rate' => $customsRateStr,
+            'customs_fee' => $customsFee,
+            'vat_rate' => $vatRateStr,
+            'vat_amount' => $vatAmount,
+            'landed_cost' => $landedCost,
             'estimated_fees' => $estimatedFees,
             'other_costs' => $otherCosts,
             'total_cost' => $totalCost,
             'estimated_profit' => $estimatedProfit,
+            'true_net_profit' => $landedBreakdown['true_net_profit'],
+            'true_margin_percentage' => $landedBreakdown['true_margin_percentage'],
             'profit_margin' => $profitMargin,
             'return_on_investment' => $roi,
             'opportunity_score' => number_format($opportunityScore, 2, '.', ''),
@@ -186,6 +224,8 @@ class ProductAnalysisEngine
             'shipping_cost' => $this->hasExplicitNumericParam($customParams, 'shipping_cost')
                 ? $customParams['shipping_cost']
                 : 0.0,
+            'customs_rate' => $customParams['customs_rate'] ?? null,
+            'vat_rate' => $customParams['vat_rate'] ?? null,
             'estimated_fees' => $this->hasExplicitNumericParam($customParams, 'estimated_fees')
                 ? $customParams['estimated_fees']
                 : 0.0,
@@ -220,6 +260,11 @@ class ProductAnalysisEngine
             'purchase_price' => $results['purchase_price'],
             'selling_price' => $hasExplicitSellingPrice ? $results['selling_price'] : null,
             'shipping_cost' => $results['shipping_cost'],
+            'customs_rate' => $results['customs_rate'] ?? null,
+            'customs_fee' => $results['customs_fee'] ?? null,
+            'vat_rate' => $results['vat_rate'] ?? null,
+            'vat_amount' => $results['vat_amount'] ?? null,
+            'landed_cost' => $results['landed_cost'] ?? null,
             'estimated_fees' => $results['estimated_fees'],
             'other_costs' => $results['other_costs'],
             'estimated_profit' => $hasExplicitSellingPrice ? $results['estimated_profit'] : null,

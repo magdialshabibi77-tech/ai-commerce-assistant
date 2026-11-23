@@ -189,6 +189,23 @@ class AIContextBuilder
                             ? 'User-supplied estimate; verified carrier rate pending.'
                             : 'Unverified baseline estimate; carrier rate pending.'),
                 ],
+                'customs_fee' => [
+                    'value' => $deterministicMetrics['customs_fee'] ?? '0.0000',
+                    'rate' => $deterministicMetrics['customs_rate'] ?? '0.0500',
+                    'truth' => DataTruthLevel::CALCULATED,
+                    'note' => 'Customs duty calculated at rate applied to purchase price.',
+                ],
+                'vat_amount' => [
+                    'value' => $deterministicMetrics['vat_amount'] ?? '0.0000',
+                    'rate' => $deterministicMetrics['vat_rate'] ?? '0.1500',
+                    'truth' => DataTruthLevel::CALCULATED,
+                    'note' => 'Value Added Tax (VAT) standard calculated on CIF basis.',
+                ],
+                'landed_cost' => [
+                    'value' => $deterministicMetrics['landed_cost'] ?? '0.0000',
+                    'truth' => DataTruthLevel::CALCULATED,
+                    'note' => 'True Landed Cost = Purchase + Shipping + Customs + VAT.',
+                ],
                 'estimated_fees' => [
                     'value' => $deterministicMetrics['estimated_fees'],
                     'truth' => DataTruthLevel::ESTIMATED,
@@ -298,6 +315,8 @@ class AIContextBuilder
             'selling_currency' => $inputs['selling_currency'] ?? $currency,
             'shipping_cost' => $inputs['shipping_cost'] ?? $observedShipping ?? 0.0,
             'shipping_currency' => $inputs['shipping_currency'] ?? $currency,
+            'customs_rate' => $inputs['customs_rate'] ?? null,
+            'vat_rate' => $inputs['vat_rate'] ?? null,
             'estimated_fees' => $inputs['estimated_fees'] ?? 0.0,
             'other_costs' => $inputs['other_costs'] ?? 0.0,
             'rating' => $rating,

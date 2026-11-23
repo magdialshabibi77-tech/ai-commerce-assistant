@@ -17,6 +17,8 @@ class AnalyzeProductRequest extends FormRequest
             'purchase_price' => ['nullable', 'numeric', 'min:0'],
             'selling_price' => ['nullable', 'numeric', 'min:0'],
             'shipping_cost' => ['nullable', 'numeric', 'min:0'],
+            'customs_rate' => ['nullable', 'numeric', 'min:0'],
+            'vat_rate' => ['nullable', 'numeric', 'min:0'],
             'estimated_fees' => ['nullable', 'numeric', 'min:0'],
             'other_costs' => ['nullable', 'numeric', 'min:0'],
         ];

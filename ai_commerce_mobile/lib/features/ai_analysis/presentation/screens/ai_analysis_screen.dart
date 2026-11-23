@@ -259,6 +259,7 @@ class _AiAnalysisScreenState extends ConsumerState<AiAnalysisScreen> {
                   child: TextFormField(
                     controller: _shippingCostController,
                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    onChanged: (val) => setState(() {}),
                     decoration: const InputDecoration(
                       labelText: 'الشحن التقديري (\$)',
                       border: OutlineInputBorder(),
@@ -276,6 +277,32 @@ class _AiAnalysisScreenState extends ConsumerState<AiAnalysisScreen> {
                       border: OutlineInputBorder(),
                       contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 12),
                     ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            // Interactive Shipping Slider
+            Row(
+              children: [
+                const Icon(Icons.local_shipping_outlined, size: 16, color: AppColors.primary),
+                const SizedBox(width: 6),
+                Text(
+                  'شريط ضبط الشحن السريع (\$${double.tryParse(_shippingCostController.text)?.toStringAsFixed(0) ?? '0'}):',
+                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                ),
+                Expanded(
+                  child: Slider(
+                    value: (double.tryParse(_shippingCostController.text) ?? 15.0).clamp(0.0, 150.0),
+                    min: 0.0,
+                    max: 150.0,
+                    divisions: 30,
+                    label: '\$${(double.tryParse(_shippingCostController.text) ?? 15.0).toStringAsFixed(0)}',
+                    onChanged: (val) {
+                      setState(() {
+                        _shippingCostController.text = val.toStringAsFixed(2);
+                      });
+                    },
                   ),
                 ),
               ],
@@ -762,6 +789,34 @@ class _AiAnalysisScreenState extends ConsumerState<AiAnalysisScreen> {
               CurrencyFormatter.formatUsd(metrics.shippingCost),
               _resolveRowTruthTag(metrics.shippingCost, metrics.shippingTruth),
             ),
+            if (metrics.customsFee != null && metrics.customsFee! > 0)
+              _buildFinancialRow(
+                'رسوم جمركية تقديرية (${metrics.customsRate != null ? (metrics.customsRate! * 100).toStringAsFixed(0) : '5'}%):',
+                CurrencyFormatter.formatUsd(metrics.customsFee),
+                _resolveRowTruthTag(metrics.customsFee, metrics.customsTruth ?? 'CALCULATED'),
+              ),
+            if (metrics.vatAmount != null && metrics.vatAmount! > 0)
+              _buildFinancialRow(
+                'ضريبة القيمة المضافة VAT (${metrics.vatRate != null ? (metrics.vatRate! * 100).toStringAsFixed(0) : '15'}%):',
+                CurrencyFormatter.formatUsd(metrics.vatAmount),
+                _resolveRowTruthTag(metrics.vatAmount, metrics.vatTruth ?? 'CALCULATED'),
+              ),
+            if (metrics.landedCost != null && metrics.landedCost! > 0)
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withAlpha(15),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: AppColors.primary.withAlpha(50)),
+                ),
+                child: _buildFinancialRow(
+                  'التكلفة الواصلة (Landed Cost):',
+                  CurrencyFormatter.formatUsd(metrics.landedCost),
+                  _resolveRowTruthTag(metrics.landedCost, metrics.landedCostTruth ?? 'CALCULATED'),
+                  isBold: true,
+                ),
+              ),
             _buildFinancialRow(
               'العمولات المتوقعة:',
               CurrencyFormatter.formatUsd(metrics.estimatedFees),

@@ -2,6 +2,11 @@ class FinancialMetricsModel {
   final double? purchasePrice;
   final double? sellingPrice;
   final double? shippingCost;
+  final double? customsFee;
+  final double? customsRate;
+  final double? vatAmount;
+  final double? vatRate;
+  final double? landedCost;
   final double? estimatedFees;
   final double? otherCosts;
   final double? totalCost;
@@ -14,6 +19,9 @@ class FinancialMetricsModel {
   final String? purchaseTruth;
   final String? sellingTruth;
   final String? shippingTruth;
+  final String? customsTruth;
+  final String? vatTruth;
+  final String? landedCostTruth;
   final String? feesTruth;
   final String? otherCostsTruth;
   final String? totalCostTruth;
@@ -23,6 +31,11 @@ class FinancialMetricsModel {
     this.purchasePrice,
     this.sellingPrice,
     this.shippingCost,
+    this.customsFee,
+    this.customsRate,
+    this.vatAmount,
+    this.vatRate,
+    this.landedCost,
     this.estimatedFees,
     this.otherCosts,
     this.totalCost,
@@ -35,6 +48,9 @@ class FinancialMetricsModel {
     this.purchaseTruth,
     this.sellingTruth,
     this.shippingTruth,
+    this.customsTruth,
+    this.vatTruth,
+    this.landedCostTruth,
     this.feesTruth,
     this.otherCostsTruth,
     this.totalCostTruth,
@@ -113,6 +129,11 @@ class FinancialMetricsModel {
       purchasePrice: extractNullableVal(json['purchase_price']),
       sellingPrice: sellingPrice,
       shippingCost: extractNullableVal(json['shipping_cost']),
+      customsFee: extractNullableVal(json['customs_fee']),
+      customsRate: extractNullableVal(json['customs_rate'] is Map ? (json['customs_rate'] as Map)['rate'] ?? (json['customs_rate'] as Map)['value'] : (json['customs_fee'] is Map ? (json['customs_fee'] as Map)['rate'] : json['customs_rate'])),
+      vatAmount: extractNullableVal(json['vat_amount']),
+      vatRate: extractNullableVal(json['vat_rate'] is Map ? (json['vat_rate'] as Map)['rate'] ?? (json['vat_rate'] as Map)['value'] : (json['vat_amount'] is Map ? (json['vat_amount'] as Map)['rate'] : json['vat_rate'])),
+      landedCost: extractNullableVal(json['landed_cost']),
       estimatedFees: extractNullableVal(json['estimated_fees']),
       otherCosts: extractNullableVal(json['other_costs']),
       totalCost: extractNullableVal(json['total_cost']),
@@ -133,6 +154,9 @@ class FinancialMetricsModel {
       purchaseTruth: _extractTruth(json['purchase_price']),
       sellingTruth: _extractTruth(json['selling_price']),
       shippingTruth: _extractTruth(json['shipping_cost']),
+      customsTruth: _extractTruth(json['customs_fee']),
+      vatTruth: _extractTruth(json['vat_amount']),
+      landedCostTruth: _extractTruth(json['landed_cost']),
       feesTruth: _extractTruth(json['estimated_fees']),
       otherCostsTruth: _extractTruth(json['other_costs']),
       totalCostTruth: _extractTruth(json['total_cost']),
