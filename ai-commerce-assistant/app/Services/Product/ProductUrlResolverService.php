@@ -20,7 +20,10 @@ class ProductUrlResolverService
         }
 
         if (! empty($originalUrl) && filter_var($originalUrl, FILTER_VALIDATE_URL)) {
-            return $originalUrl;
+            // Avoid synthetic/broken mock links (e.g. EBAY-, example.com, placeholder.com)
+            if (! str_contains($originalUrl, 'EBAY-') && ! str_contains($originalUrl, 'example.com') && ! str_contains($originalUrl, 'placeholder.com')) {
+                return $originalUrl;
+            }
         }
 
         $encodedQuery = urlencode(trim($productTitle));

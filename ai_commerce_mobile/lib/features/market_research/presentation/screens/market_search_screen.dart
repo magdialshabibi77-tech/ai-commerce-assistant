@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:ai_commerce_mobile/core/constants/app_colors.dart';
 import 'package:ai_commerce_mobile/core/constants/app_strings.dart';
 import 'package:ai_commerce_mobile/core/utils/currency_formatter.dart';
@@ -207,15 +208,31 @@ class _MarketSearchScreenState extends ConsumerState<MarketSearchScreen> {
           margin: const EdgeInsets.only(bottom: 12),
           child: InkWell(
             borderRadius: BorderRadius.circular(14),
-            onTap: item.canonicalProductId != null
-                ? () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => ProductDetailsScreen(productId: item.canonicalProductId!),
-                      ),
-                    );
+            onTap: () async {
+              if (item.canonicalProductId != null) {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => ProductDetailsScreen(productId: item.canonicalProductId!),
+                  ),
+                );
+              } else {
+                final rawUrl = (item.url != null && item.url!.trim().isNotEmpty)
+                    ? item.url!.trim()
+                    : null;
+                final finalUrl = rawUrl ??
+                    'https://www.google.com/search?q=${Uri.encodeComponent('${item.sourceName} ${item.title}')}';
+                final uri = Uri.parse(finalUrl);
+                try {
+                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                } catch (_) {
+                  try {
+                    await launchUrl(uri);
+                  } catch (e) {
+                    debugPrint('Error launching store url: $e');
                   }
-                : null,
+                }
+              }
+            },
             child: Padding(
               padding: const EdgeInsets.all(14.0),
               child: Column(
@@ -306,6 +323,21 @@ class _MarketSearchScreenState extends ConsumerState<MarketSearchScreen> {
                             ),
                             SizedBox(width: 4),
                             Icon(Icons.arrow_forward_ios_rounded, size: 12, color: AppColors.primary),
+                          ],
+                        )
+                      else
+                        const Row(
+                          children: [
+                            Text(
+                              'شراء / فتح في المتجر',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(width: 4),
+                            Icon(Icons.open_in_new_rounded, size: 12, color: AppColors.primary),
                           ],
                         ),
                     ],

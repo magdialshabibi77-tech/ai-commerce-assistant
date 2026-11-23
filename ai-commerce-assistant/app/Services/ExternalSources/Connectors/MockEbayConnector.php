@@ -300,17 +300,22 @@ class MockEbayConnector implements MarketConnectorInterface
 
         if (empty($matched) && ! empty($query)) {
             $slug = substr(preg_replace('/[^a-zA-Z0-9]/', '', md5($query)), 0, 8);
-            $cleanTitle = ucwords(preg_replace('/[^\p{L}\p{N}\s]/u', ' ', $query));
+            $cleanTitle = trim(preg_replace('/\s+/', ' ', preg_replace('/[^\p{L}\p{N}\s]/u', ' ', $query)));
+            $isArabic = preg_match('/\p{Arabic}/u', $cleanTitle);
+            $title1 = $isArabic ? "{$cleanTitle} - أصلي جديد مع الضمان" : "Brand New {$cleanTitle} - Official Warranty Fast Shipping";
+            $title2 = $isArabic ? "{$cleanTitle} - الإصدار العالمي المعتمد" : "Original {$cleanTitle} Factory Unlocked Global Edition";
+            $searchUrl = 'https://www.ebay.com/sch/i.html?_nkw=' . urlencode($cleanTitle);
+
             $matched = [
                 [
                     'itemId' => "v1|EBAY-DYNAMIC-{$slug}-1|0",
-                    'title' => "Brand New {$cleanTitle} - Official Warranty Fast Shipping",
+                    'title' => $title1,
                     'price' => [
                         'value' => '129.99',
                         'currency' => 'USD',
                     ],
                     'condition' => 'New',
-                    'itemWebUrl' => "https://www.ebay.com/itm/EBAY-DYNAMIC-{$slug}-1",
+                    'itemWebUrl' => $searchUrl,
                     'image' => [
                         'imageUrl' => 'https://via.placeholder.com/640x480.png?text=' . urlencode($cleanTitle),
                     ],
@@ -336,13 +341,13 @@ class MockEbayConnector implements MarketConnectorInterface
                 ],
                 [
                     'itemId' => "v1|EBAY-DYNAMIC-{$slug}-2|0",
-                    'title' => "Original {$cleanTitle} Factory Unlocked Global Edition",
+                    'title' => $title2,
                     'price' => [
                         'value' => '189.50',
                         'currency' => 'USD',
                     ],
                     'condition' => 'New',
-                    'itemWebUrl' => "https://www.ebay.com/itm/EBAY-DYNAMIC-{$slug}-2",
+                    'itemWebUrl' => $searchUrl,
                     'image' => [
                         'imageUrl' => 'https://via.placeholder.com/640x480.png?text=' . urlencode($cleanTitle),
                     ],

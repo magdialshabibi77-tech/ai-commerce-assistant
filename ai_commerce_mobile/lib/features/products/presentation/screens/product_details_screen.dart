@@ -455,23 +455,27 @@ class ProductDetailsScreen extends ConsumerWidget {
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: () async {
-                  final targetUrl = offer.buyUrl ?? offer.affiliateUrl ?? offer.url;
-                  if (targetUrl != null && targetUrl.isNotEmpty) {
-                    final uri = Uri.parse(targetUrl);
-                    if (await canLaunchUrl(uri)) {
-                      await launchUrl(uri, mode: LaunchMode.externalApplication);
-                      return;
+                  final rawUrl = (offer.buyUrl != null && offer.buyUrl!.trim().isNotEmpty)
+                      ? offer.buyUrl!.trim()
+                      : (offer.affiliateUrl != null && offer.affiliateUrl!.trim().isNotEmpty)
+                          ? offer.affiliateUrl!.trim()
+                          : (offer.url != null && offer.url!.trim().isNotEmpty)
+                              ? offer.url!.trim()
+                              : null;
+
+                  final finalUrl = rawUrl ??
+                      'https://www.google.com/search?q=${Uri.encodeComponent('${offer.sourceName} ${offer.title}')}';
+
+                  final uri = Uri.parse(finalUrl);
+                  try {
+                    await launchUrl(uri, mode: LaunchMode.externalApplication);
+                  } catch (_) {
+                    try {
+                      await launchUrl(uri);
+                    } catch (e) {
+                      debugPrint('Error launching store URL: $e');
                     }
                   }
-
-                  // Null / Invalid Fallback SnackBar
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('عذراً، هذا العرض غير متاح للشراء المباشر حالياً، يمكنك البحث عنه في المتجر'),
-                      backgroundColor: Colors.blueGrey,
-                      duration: Duration(seconds: 3),
-                    ),
-                  );
                 },
                 icon: const Icon(Icons.shopping_cart_checkout_rounded, size: 15),
                 label: const Text('شراء الآن من المتجر (Buy Now)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
